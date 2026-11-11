@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Carteira">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#132238">
+<meta name="robots" content="noindex,nofollow">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="icone.png">
+<link rel="icon" href="icone.png">
+<title>Minha Carteira</title>
+<style>
+:root{--bg:#f4f5f7;--line:#e3e6ea;--txt:#1c2430;--muted:#6b7684;--pri:#0b5cad;--wa:#128c4a;--bad:#b42318;--warn:#b45309;--nav:#132238;--st:env(safe-area-inset-top);--sb:env(safe-area-inset-bottom)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overscroll-behavior:none}
+body{font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--txt);background:var(--bg);display:flex;flex-direction:column}
+button,input,select,textarea{font:inherit;color:inherit}
+header{background:var(--nav);color:#fff;padding:calc(var(--st) + 10px) 16px 10px;display:flex;align-items:center;justify-content:space-between;flex:none}
+header h1{font-size:18px;margin:0;font-weight:600}
+#nuvem{background:none;border:0;color:#c9d3e0;font-size:12.5px;display:flex;gap:6px;align-items:center;padding:6px 0 6px 12px}
+#nuvem i{width:9px;height:9px;border-radius:50%;background:#8a94a1}
+#nuvem.ok i{background:#3ddc84}#nuvem.sync i{background:#f5c04a}#nuvem.erro i,#nuvem.offline i{background:#ff6b6b}
+main{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:12px 12px 20px}
+#tabs{flex:none;display:flex;background:#fff;border-top:1px solid var(--line);padding-bottom:var(--sb)}
+#tabs button{flex:1;background:none;border:0;padding:8px 0 7px;font-size:11.5px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
+#tabs button.on{color:var(--pri);font-weight:600}
+#tabs svg{width:23px;height:23px}
+#tabs b{position:absolute;top:3px;left:calc(50% + 6px);background:#e5484d;color:#fff;font-size:10.5px;border-radius:9px;padding:0 5px;min-width:16px}
+#tabs b:empty{display:none}
+input[type=search],input[type=text],input[type=tel],input[type=number],input[type=date],input[type=datetime-local],select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;outline:none;font-size:16px;-webkit-appearance:none;appearance:none}
+textarea{resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:var(--pri)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:10px 0;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:13.5px;white-space:nowrap}
+.chip b{color:var(--muted);margin-left:4px}
+.chip.on{background:var(--nav);color:#fff;border-color:var(--nav)}.chip.on b{color:#c9d3e0}
+.grupo{font-size:12px;font-weight:700;color:#1d3150;text-transform:uppercase;letter-spacing:.04em;margin:14px 4px 6px;display:flex;justify-content:space-between}
+.grupo span{font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;padding:10px 12px;width:100%;text-align:left}
+.card .corpo{flex:1;min-width:0}
+.card strong{display:block;font-size:14.5px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card small{color:var(--muted);font-size:12.5px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card.atras{border-color:#f3c7c4;background:#fff6f5}.card.atras small{color:var(--bad)}
+.card.feito strong{text-decoration:line-through;color:var(--muted)}
+.et{display:inline-block;font-size:11.5px;font-weight:600;border-radius:999px;padding:1px 8px;margin-right:4px}
+.e-novo{background:#e8eef6;color:#1d4f91}.e-contato{background:#fdf3e2;color:#92500a}.e-negociando{background:#efe9fb;color:#5b34a8}.e-cliente{background:#e2f5ea;color:#0e6b39}.e-sem{background:#f1f2f4;color:#5c6672}
+.zap{flex:none;width:42px;height:42px;border-radius:50%;background:var(--wa);color:#fff;display:grid;place-items:center;text-decoration:none;border:0}
+.zap.sem{background:#d5d9de}
+.zap svg{width:21px;height:21px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 14px;font-weight:600;text-align:center;text-decoration:none;color:var(--txt);display:inline-block}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
+.btn.wa{background:var(--wa);border-color:var(--wa);color:#fff}
+.btn.perigo{color:var(--bad)}
+.btn.peq{padding:6px 10px;font-size:13.5px;font-weight:500}
+.btn.largo{display:block;width:100%}
+.linha{display:flex;gap:8px;align-items:center}
+.linha>*{flex:1;min-width:0}
+.linha>.fixo{flex:none}
+.vazio{text-align:center;color:var(--muted);padding:36px 16px}
+.muted{color:var(--muted)}
+label{font-size:12.5px;color:var(--muted);display:block;margin:10px 2px 3px}
+h3{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:22px 2px 8px;display:flex;justify-content:space-between;align-items:center}
+.fab{position:fixed;right:16px;bottom:calc(var(--sb) + 72px);width:54px;height:54px;border-radius:50%;background:var(--pri);color:#fff;border:0;font-size:28px;box-shadow:0 4px 14px #0004;z-index:5}
+#folha{position:fixed;inset:0;background:var(--bg);z-index:10;display:none;flex-direction:column}
+#folha.on{display:flex}
+#folha header button{background:none;border:0;color:#fff;font-size:16px;padding:6px 0}
+#folha-c{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(var(--sb) + 30px)}
+#folha-c h2{font-size:19px;margin:0 0 2px;line-height:1.25}
+.cal{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}
+.cal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.cal-top button{background:none;border:0;font-size:24px;padding:2px 14px;color:var(--pri)}
+.cal-grade{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-sem{text-align:center;font-size:11px;color:var(--muted);padding:2px 0}
+.cal-dia{background:none;border:0;border-radius:9px;height:42px;font-size:14.5px;position:relative;padding:0 0 9px}
+.cal-dia.hoje{font-weight:700;color:var(--pri);box-shadow:inset 0 0 0 1.5px var(--pri)}
+.cal-dia.sel{background:var(--nav);color:#fff;box-shadow:none}
+.cal-dia i{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-style:normal;font-size:9.5px;background:#d98a1c;color:#fff;border-radius:7px;padding:0 4px;line-height:13px;min-width:13px}
+.cal-dia.atras i{background:#e5484d}
+.cal-dia i.ok{background:none;color:#1a9b57}
+.item-ped{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px}
+.total{font-size:18px;font-weight:700;text-align:right;margin:10px 2px}
+.cats{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px}
+.cat{flex:none;width:150px;border:2px solid var(--line);border-radius:12px;background:#fff;padding:8px;text-align:left}
+.cat.on{border-color:var(--pri)}
+.cat img{width:100%;height:120px;object-fit:cover;border-radius:6px;background:#e8eef6;display:block}
+.cat strong{font-size:13px;display:block;margin-top:6px;line-height:1.2}
+.cat small{color:var(--muted);font-size:11.5px}
+.pag{background:#fff;margin-bottom:10px;box-shadow:0 1px 4px #0002}
+.pag canvas{width:100%;display:block}
+.fora{color:var(--bad);font-size:11.5px;font-weight:600}
+#aviso{position:fixed;left:12px;right:12px;bottom:calc(var(--sb) + 70px);background:var(--nav);color:#fff;border-radius:12px;padding:12px 14px;z-index:30;display:none;font-size:14.5px;box-shadow:0 6px 20px #0005}
+#instalar{background:#fff7e0;border:1px solid #f1dc9c;border-radius:12px;padding:10px 12px;font-size:13.5px;margin-bottom:10px;display:none}
+#conectar{padding:calc(var(--st) + 40px) 22px;display:none;flex-direction:column;gap:12px;height:100%}
+</style>
+</head>
+<body>
+<div id="conectar">
+  <h1 style="margin:0">Minha Carteira</h1>
+  <p class="muted" style="margin:0">Este aparelho ainda não está conectado. No computador, abra o app <b>Minha Carteira</b>, vá em <b>Celular</b> e aponte a câmera para o QR code — ou copie o link de lá e cole aqui:</p>
+  <textarea id="cola" rows="4" placeholder="Cole aqui o link de conexão"></textarea>
+  <button class="btn pri" id="btn-conectar">Conectar</button>
+</div>
+
+<header id="topo"><h1 id="titulo">Carteira</h1><button id="nuvem"><i></i><span></span></button></header>
+<main id="conteudo"></main>
+<nav id="tabs">
+  <button data-aba="carteira"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.500 6.500 0 0 1 13 0M16 4.500a3.500 3.500 0 0 1 0 7M18 14.500a6 6 0 0 1 3.500 5.500" stroke-linecap="round"/></svg>Carteira</button>
+  <button data-aba="agenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.500" rx="2.500"/><path d="M3.500 10h17M8 3v4M16 3v4" stroke-linecap="round"/></svg>Agenda<b id="b-agenda"></b></button>
+  <button data-aba="pedidos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3.500h12v17l-3-2-3 2-3-2-3 2zM9 8.500h6M9 12.500h6" stroke-linejoin="round" stroke-linecap="round"/></svg>Pedidos</button>
+  <button data-aba="catalogo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5.500c3-1.500 5.500-1.500 8 0v14c-2.500-1.500-5-1.500-8 0zM20 5.500c-3-1.500-5.500-1.500-8 0v14c2.500-1.500 5-1.500 8 0z" stroke-linejoin="round"/></svg>Catálogo</button>
+</nav>
+<button class="fab" id="fab" aria-label="Adicionar">+</button>
+<div id="folha"><header><button id="voltar">‹ Voltar</button><h1 id="folha-t"></h1><span style="width:60px"></span></header><div id="folha-c"></div></div>
+<div id="aviso"></div>
+
+<script src="comum.js"></script>
+<script>
+const ZAP = '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-5 4v-4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>';
+let D = { leads: [], pedidos: [], lembretes: [], catalogos: [], apagados: {} };
+const M = { aba: 'carteira', q: '', etapa: '', folha: null, mes: hojeISO().slice(0, 7), dia: null, catId: null, catQ: '', pedStatus: '' };
+let foto = new Map(), tSalvar, pendente = false;
+const guarda = { get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+const lead = id => D.leads.find(l => l.id === id);
+const etapaNome = id => (ETAPAS.find(e => e.id === id) || ETAPAS[0]).nome;
+const linkZap = (l, texto) => { const t = analisaTel(l.telefone); return t.wa ? `https://wa.me/${t.wa}` + (texto ? `?text=${encodeURIComponent(texto)}` : '') : null; };
+
+function salvar() { if (carimbar(D, foto)) Nuvem.mudou(); clearTimeout(tSalvar); tSalvar = setTimeout(() => guarda.set('carteira-dados', D), 300); }
+function aviso(msg) { const a = $('#aviso'); a.textContent = msg; a.style.display = 'block'; clearTimeout(aviso.t); aviso.t = setTimeout(() => a.style.display = 'none', 3500); }
+
+/* ---------- conexão ---------- */
+function leLink(txt) {
+  const h = String(txt || '').split('#')[1] || String(txt || ''); const p = new URLSearchParams(h);
+  return p.get('t') && p.get('d') ? { token: p.get('t'), dono: p.get('d') } : null;
+}
+function entrar() {
+  const cfg = leLink(location.hash) || guarda.get('carteira-cfg');
+  const on = !!cfg;
+  $('#conectar').style.display = on ? 'none' : 'flex';
+  ['topo', 'conteudo', 'tabs', 'fab'].forEach(i => $('#' + i).style.display = on ? '' : 'none');
+  if (!on) return;
+  guarda.set('carteira-cfg', cfg);
+  const local = guarda.get('carteira-dados'); if (local && local.leads) D = local;
+  COLECOES.forEach(c => D[c] = D[c] || []); D.apagados = D.apagados || {};
+  foto = fotografar(D);
+  Nuvem.cfg = cfg; if (window.API_BASE) Nuvem.base = window.API_BASE;
+  Nuvem.dados = () => D;
+  Nuvem.aoReceber = novo => { aplicar(D, novo); foto = fotografar(D); guarda.set('carteira-dados', D); redesenho(); };
+  Nuvem.aoMudar = statusNuvem;
+  Nuvem.iniciar(30);
+  desenhar();
+}
+function statusNuvem() {
+  const b = $('#nuvem'); b.className = Nuvem.estado;
+  $('span', b).textContent = { ok: 'Sincronizado', sync: 'Sincronizando…', erro: 'Erro', offline: 'Sem internet', off: '' }[Nuvem.estado] || '';
+  if (M.folha && M.folha.tipo === 'config') abreFolha(M.folha);
+}
+function redesenho() {
+  const a = document.activeElement;
+  if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName) && a.id !== 'q') { pendente = true; return; }
+  desenhar(); if (M.folha) abreFolha(M.folha, true);
+}
+document.addEventListener('focusout', () => setTimeout(() => { if (pendente) { pendente = false; redesenho(); } }, 400));
+
+/* ---------- telas ---------- */
+function desenhar() {
+  $$('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.aba === M.aba));
+  $('#titulo').textContent = { carteira: 'Carteira', agenda: 'Agenda', pedidos: 'Pedidos', catalogo: 'Catálogo' }[M.aba];
+  $('#b-agenda').textContent = D.lembretes.filter(l => !l.feito && l.quando <= hojeISO() + 'T23:59').length || '';
+  $('#fab').style.display = M.aba === 'catalogo' ? 'none' : '';
+  ({ carteira: telaCarteira, agenda: telaAgenda, pedidos: telaPedidos, catalogo: telaCatalogo })[M.aba]();
+}
+function telaCarteira() {
+  const c = $('#conteudo');
+  if (!$('#q')) c.innerHTML = `<div id="instalar"></div><input type="search" id="q" placeholder="Buscar nome, cidade, franqueado, CNPJ…"><div class="chips" id="chips"></div><div id="lista"></div>`;
+  const inst = $('#instalar');
+  if (!navigator.standalone && !matchMedia('(display-mode: standalone)').matches && !guarda.get('carteira-inst')) {
+    inst.style.display = 'block'; inst.innerHTML = 'Para virar um app: toque em <b>Compartilhar</b> (quadrado com seta) e depois em <b>Adicionar à Tela de Início</b>. <button class="btn peq" id="inst-ok" style="margin-top:6px">Entendi</button>';
+  } else inst.style.display = 'none';
+  $('#chips').innerHTML = `<button class="chip ${M.etapa ? '' : 'on'}" data-etapa="">Todos<b>${D.leads.length}</b></button>` + ETAPAS.map(e => `<button class="chip ${M.etapa === e.id ? 'on' : ''}" data-etapa="${e.id}">${e.nome}<b>${D.leads.filter(l => l.etapa === e.id).length}</b></button>`).join('');
+  const q = semAcento(M.q).trim(), qd = soDigitos(M.q);
+  const xs = D.leads.filter(l => (!M.etapa || l.etapa === M.etapa) && (!q || semAcento([l.razao, l.franqueado, l.cidade, l.consultor, l.zbrm, l.obs].join(' ')).includes(q) || (qd.length >= 3 && (soDigitos(l.cnpj).includes(qd) || soDigitos(l.telefone).includes(qd)))));
+  const g = new Map(); xs.forEach(l => { const k = (semAcento(l.cidade).trim() || 'SEM CIDADE') + (l.uf ? ' — ' + l.uf.toUpperCase() : ''); (g.get(k) || g.set(k, []).get(k)).push(l); });
+  const comL = new Set(D.lembretes.filter(x => !x.feito).map(x => x.leadId));
+  $('#lista').innerHTML = [...g.keys()].sort((a, b) => a.localeCompare(b, 'pt')).map(k => `<div class="grupo">${esc(k)}<span>${g.get(k).length}</span></div>` +
+    g.get(k).sort((a, b) => a.razao.localeCompare(b.razao, 'pt')).map(l => {
+      const z = linkZap(l);
+      return `<div class="card"><button class="corpo" data-lead="${l.id}" style="background:none;border:0;padding:0;text-align:left"><strong>${esc(l.razao || '(sem nome)')}</strong><small><span class="et e-${l.etapa}">${etapaNome(l.etapa)}</span>${comL.has(l.id) ? '<span style="color:var(--warn)">● </span>' : ''}${esc(l.franqueado || '')}</small></button>
+        ${z ? `<a class="zap" href="${z}" target="_blank" rel="noopener" aria-label="WhatsApp">${ZAP}</a>` : `<button class="zap sem" data-lead="${l.id}" aria-label="Sem telefone válido">${ZAP}</button>`}</div>`;
+    }).join('')).join('') || `<div class="vazio">${D.leads.length ? 'Nenhum lead com esse filtro.' : (Nuvem.estado === 'ok' ? 'A carteira está vazia. Importe a lista pelo computador.' : 'Buscando seus dados…')}</div>`;
+}
+function cardLembrete(x, comLead) {
+  const l = lead(x.leadId), atras = !x.feito && x.quando < isoLocal(new Date());
+  return `<div class="card ${atras ? 'atras' : ''} ${x.feito ? 'feito' : ''}"><input type="checkbox" data-feito="${x.id}" ${x.feito ? 'checked' : ''} style="width:22px;height:22px;flex:none;-webkit-appearance:auto;appearance:auto">
+    <button class="corpo" ${l && comLead ? `data-lead="${l.id}"` : ''} style="background:none;border:0;padding:0;text-align:left"><strong>${esc(x.texto)}</strong><small>${atras ? 'Atrasado · ' : ''}${quandoBR(x.quando)}${l && comLead ? ' · ' + esc(l.razao) : ''}</small></button>
+    ${x.feito ? '' : `<button class="btn peq fixo" data-adiar="${x.id}">+1 dia</button>`}<button class="btn peq perigo fixo" data-ldel="${x.id}">✕</button></div>`;
+}
+function telaAgenda() {
+  const agora = isoLocal(new Date()), fim = hojeISO() + 'T23:59';
+  const ab = D.lembretes.filter(x => !x.feito).sort((a, b) => a.quando.localeCompare(b.quando));
+  let lista;
+  if (M.dia) {
+    const xs = D.lembretes.filter(x => x.quando.slice(0, 10) === M.dia).sort((a, b) => a.quando.localeCompare(b.quando));
+    lista = `<h3>${dataBR(M.dia)} <button class="btn peq" data-dia="">Ver todos</button></h3>` + (xs.map(x => cardLembrete(x, true)).join('') || '<div class="vazio">Nada marcado neste dia. Toque no + para criar.</div>');
+  } else {
+    lista = [['Atrasados', ab.filter(x => x.quando < agora)], ['Hoje', ab.filter(x => x.quando >= agora && x.quando <= fim)], ['Próximos', ab.filter(x => x.quando > fim)]]
+      .filter(g => g[1].length).map(([n, xs]) => `<h3>${n} (${xs.length})</h3>` + xs.map(x => cardLembrete(x, true)).join('')).join('') || '<div class="vazio">Nenhum lembrete pendente.</div>';
+  }
+  $('#conteudo').innerHTML = `<div class="cal">${calendarioHTML(M.mes, D.lembretes, M.dia)}</div>${lista}`;
+}
+function telaPedidos() {
+  const xs = D.pedidos.filter(p => !M.pedStatus || p.status === M.pedStatus).sort((a, b) => b.data.localeCompare(a.data));
+  $('#conteudo').innerHTML = `<div class="chips" style="padding-top:0"><button class="chip ${M.pedStatus ? '' : 'on'}" data-ps="">Todos<b>${D.pedidos.length}</b></button>${PED_STATUS.map(s => `<button class="chip ${M.pedStatus === s ? 'on' : ''}" data-ps="${s}">${s}<b>${D.pedidos.filter(p => p.status === s).length}</b></button>`).join('')}</div>` +
+    (xs.map(p => `<button class="card" data-ped="${p.id}"><div class="corpo"><strong>${esc(lead(p.leadId)?.razao || '(lead excluído)')}</strong><small>${dataBR(p.data)} · ${esc(p.status)} · ${p.itens.length} ${p.itens.length === 1 ? 'item' : 'itens'}</small></div><b>${dinheiro(totalPedido(p))}</b></button>`).join('') || '<div class="vazio">Nenhum pedido. Toque no + para criar.</div>');
+}
+function telaCatalogo() {
+  const cats = [...D.catalogos].sort((a, b) => b.adicionadoEm.localeCompare(a.adicionadoEm));
+  if (!cats.find(c => c.id === M.catId)) M.catId = cats[0]?.id || null;
+  const c = cats.find(x => x.id === M.catId);
+  if (!c) return $('#conteudo').innerHTML = '<div class="vazio">Nenhum catálogo. Adicione o PDF pelo computador.</div>';
+  if (!$('#cat-q') || telaCatalogo.de !== M.catId + cats.length) {
+    telaCatalogo.de = M.catId + cats.length;
+    $('#conteudo').innerHTML = `<div class="cats">${cats.map(x => `<button class="cat ${x.id === M.catId ? 'on' : ''}" data-cat="${x.id}">${x.capa ? `<img src="${x.capa}" alt="">` : ''}<strong>${esc(x.nome)}</strong><small>${dataBR(x.adicionadoEm)} · ${(x.produtos || []).length} produtos</small></button>`).join('')}</div>
+      <button class="btn largo" id="ver-pdf" style="margin:4px 0 10px">Folhear o PDF deste catálogo</button><input type="search" id="cat-q" value="${esc(M.catQ)}" placeholder="Buscar produto, marca ou referência…"><div id="prods" style="margin-top:10px"></div>`;
+  }
+  const q = semAcento(M.catQ).trim(), ps = (c.produtos || []).filter(p => !q || semAcento(`${p.nome} ${p.marca} ${p.ref}`).includes(q));
+  $('#prods').innerHTML = ps.slice(0, 200).map(p => `<div class="card"><div class="corpo"><strong style="white-space:normal">${esc(p.nome)}</strong><small>${esc(p.marca)} · ref. ${esc(p.ref)} · pág. ${p.pagina}${p.foraDeLinha ? ' · <span class="fora">Fora de linha</span>' : ''}</small></div><div style="text-align:right"><b>${dinheiro(p.preco)}</b><small class="muted" style="display:block;font-size:11.5px">${esc(p.unidade)}</small></div></div>`).join('') || '<div class="vazio">Nenhum produto encontrado.</div>';
+}
+
+/* ---------- folhas (telas cheias) ---------- */
+function abreFolha(f, manter) {
+  M.folha = f; const c = $('#folha-c'), topo = manter ? c.scrollTop : 0;
+  $('#folha').classList.add('on');
+  ({ lead: folhaLead, pedido: folhaPedido, lembrete: folhaLembrete, config: folhaConfig, pdf: folhaPdf })[f.tipo](f, c);
+  c.scrollTop = topo;
+}
+function fechaFolha() { const f = M.folha; M.folha = null; $('#folha').classList.remove('on'); $('#folha-c').innerHTML = ''; if (f && f.volta) abreFolha(f.volta); else desenhar(); }
+function folhaLead(f, c) {
+  const l = lead(f.id); if (!l) return fechaFolha();
+  $('#folha-t').textContent = 'Lead';
+  const t = analisaTel(l.telefone), z = linkZap(l);
+  const lembs = D.lembretes.filter(x => x.leadId === l.id && !x.feito).sort((a, b) => a.quando.localeCompare(b.quando));
+  const peds = D.pedidos.filter(p => p.leadId === l.id).sort((a, b) => b.data.localeCompare(a.data));
+  c.innerHTML = `<h2 id="l-t">${esc(l.razao)}</h2><div class="muted">${esc(l.cidade)}${l.uf ? ' — ' + esc(l.uf) : ''}${l.franqueado ? ' · ' + esc(l.franqueado) : ''}</div>
+    <div class="linha" style="margin-top:12px">${z ? `<a class="btn wa" href="${z}" target="_blank" rel="noopener">WhatsApp</a><a class="btn" href="tel:+${t.wa}">Ligar</a>` : `<div class="muted">${t.tipo === 'vazio' ? 'Sem telefone.' : 'Telefone incompleto (precisa de DDD + número).'} Corrija abaixo.</div>`}</div>
+    <label>Etapa</label><select data-f="etapa">${ETAPAS.map(e => `<option value="${e.id}" ${e.id === l.etapa ? 'selected' : ''}>${e.nome}</option>`).join('')}</select>
+    <label>Telefone${t.tipo === 'fixo' ? ' (parece fixo — pode não ter WhatsApp)' : ''}</label><input type="tel" data-f="telefone" value="${esc(l.telefone)}">
+    <label>Observações</label><textarea data-f="obs" rows="4" placeholder="Anote o que combinou com o cliente…">${esc(l.obs)}</textarea>
+    <h3>Lembretes</h3>${lembs.map(x => cardLembrete(x, false)).join('') || '<div class="muted">Nenhum lembrete.</div>'}
+    <div class="linha" style="margin-top:8px;flex-wrap:wrap"><button class="btn peq" data-rapido="1">Amanhã 9h</button><button class="btn peq" data-rapido="3">Em 3 dias</button><button class="btn peq" data-rapido="7">Em 1 semana</button><button class="btn peq" data-rapido="x">Escolher…</button></div>
+    <h3>Pedidos <button class="btn peq" data-novo-ped="${l.id}">+ Novo pedido</button></h3>
+    ${peds.map(p => `<button class="card" data-ped="${p.id}"><div class="corpo"><strong>${dataBR(p.data)} · ${dinheiro(totalPedido(p))}</strong><small>${esc(p.status)} · ${p.itens.length} ${p.itens.length === 1 ? 'item' : 'itens'}</small></div></button>`).join('') || '<div class="muted">Nenhum pedido ainda.</div>'}
+    <h3>Dados do cadastro</h3>${CAMPOS.filter(([k]) => k !== 'telefone').map(([k, n]) => `<label>${n}</label><input type="text" data-f="${k}" value="${esc(k === 'cnpj' ? fmtCnpj(l[k]) : l[k])}">`).join('')}
+    <button class="btn perigo largo" id="l-del" style="margin-top:22px">Excluir este lead</button>`;
+}
+function folhaLembrete(f, c) {
+  $('#folha-t').textContent = 'Lembrete'; const l = lead(f.leadId);
+  c.innerHTML = `${l ? `<h2>${esc(l.razao)}</h2>` : `<label>Lead (opcional)</label><input type="text" id="lb-lead" list="dl-leads" placeholder="Digite o nome…"><datalist id="dl-leads">${D.leads.map(x => `<option value="${esc(x.razao)}">`).join('')}</datalist>`}
+    <label>O que lembrar</label><input type="text" id="lb-txt" placeholder="Ex.: retornar sobre o pedido">
+    <label>Quando</label><input type="datetime-local" id="lb-quando" value="${f.dia ? f.dia + 'T09:00' : emDias(1)}">
+    <button class="btn pri largo" id="lb-ok" style="margin-top:18px">Salvar lembrete</button>`;
+}
+function folhaPedido(f, c) {
+  $('#folha-t').textContent = 'Pedido';
+  if (!f.p) { const ex = D.pedidos.find(p => p.id === f.id); f.novo = !ex; f.p = ex ? JSON.parse(JSON.stringify(ex)) : { id: uid(), leadId: f.leadId || null, data: hojeISO(), status: 'Em aberto', itens: [{ nome: '', ref: '', qtd: 1, preco: 0 }], obs: '' }; }
+  const p = f.p, l = lead(p.leadId), prods = produtosDe(D);
+  f.rot = new Map(prods.map(x => [`${x.nome} [${x.ref}]`, x]));
+  c.innerHTML = `<label>Cliente</label><input type="text" id="pd-lead" list="dl-l2" value="${esc(l?.razao || f.nomeLead || '')}" placeholder="Digite o nome…"><datalist id="dl-l2">${D.leads.map(x => `<option value="${esc(x.razao)}">`).join('')}</datalist>
+    <div class="linha"><div><label>Data</label><input type="date" id="pd-data" value="${p.data}"></div><div><label>Situação</label><select id="pd-status">${PED_STATUS.map(s => `<option ${s === p.status ? 'selected' : ''}>${s}</option>`).join('')}</select></div></div>
+    <datalist id="dl-prod">${prods.map(x => `<option value="${esc(`${x.nome} [${x.ref}]`)}">${dinheiro(x.preco)}</option>`).join('')}</datalist>
+    <h3>Itens</h3>${p.itens.map((i, n) => `<div class="item-ped" data-i="${n}"><input type="text" data-c="nome" list="dl-prod" value="${esc(i.nome)}" placeholder="Produto (digite para buscar)">
+      <div class="linha" style="margin-top:6px"><div><label style="margin-top:0">Qtd</label><input type="number" inputmode="decimal" data-c="qtd" value="${i.qtd}"></div><div><label style="margin-top:0">Preço un.</label><input type="number" inputmode="decimal" step="0.01" data-c="preco" value="${i.preco}"></div><button class="btn peq perigo fixo" data-rm="${n}" style="align-self:flex-end">✕</button></div></div>`).join('')}
+    <button class="btn peq" id="pd-add">+ Adicionar item</button>
+    <div class="total" id="pd-total">Total: ${dinheiro(totalPedido(p))}</div>
+    <label>Observações</label><textarea id="pd-obs" rows="2">${esc(p.obs)}</textarea>
+    <button class="btn pri largo" id="pd-ok" style="margin-top:16px">Salvar pedido</button>
+    <button class="btn wa largo" id="pd-zap" style="margin-top:8px">Salvar e mandar resumo no WhatsApp</button>
+    ${f.novo ? '' : '<button class="btn perigo largo" id="pd-del" style="margin-top:8px">Excluir pedido</button>'}`;
+}
+function lePedido(f) { const p = f.p; p.data = $('#pd-data').value || hojeISO(); p.status = $('#pd-status').value; p.obs = $('#pd-obs').value.trim(); f.nomeLead = $('#pd-lead').value; const a = D.leads.find(x => x.razao === f.nomeLead); p.leadId = a ? a.id : null; }
+function gravaPedido(f) {
+  lePedido(f); const p = f.p; p.itens = p.itens.filter(i => i.nome.trim());
+  if (!p.leadId) { aviso('Escolha o cliente na lista.'); return false; }
+  if (!p.itens.length) { p.itens.push({ nome: '', ref: '', qtd: 1, preco: 0 }); aviso('Adicione pelo menos um item.'); return false; }
+  const ex = D.pedidos.find(x => x.id === p.id); if (ex) Object.assign(ex, p); else D.pedidos.push(p);
+  const cli = lead(p.leadId); if (cli && cli.etapa !== 'cliente' && p.status !== 'Cancelado') cli.etapa = 'cliente';
+  salvar(); return true;
+}
+function folhaConfig(f, c) {
+  $('#folha-t').textContent = 'Sincronização';
+  c.innerHTML = `<h2>${{ ok: 'Tudo sincronizado', sync: 'Sincronizando…', erro: 'Não consegui sincronizar', offline: 'Sem internet', off: 'Desligada' }[Nuvem.estado]}</h2>
+    <p class="muted">${Nuvem.erro ? esc(Nuvem.erro) : Nuvem.ultima ? 'Última vez: ' + Nuvem.ultima.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + '.' : ''} O que você muda aqui aparece no computador em menos de um minuto, e vice-versa. Sem internet, o app guarda as mudanças e envia quando a conexão voltar.</p>
+    <p class="muted">${D.leads.length} leads · ${D.pedidos.length} pedidos · ${D.lembretes.filter(x => !x.feito).length} lembretes pendentes · ${D.catalogos.length} catálogos</p>
+    <button class="btn pri largo" id="cf-sync">Sincronizar agora</button>
+    <button class="btn perigo largo" id="cf-sair" style="margin-top:10px">Desconectar este aparelho</button>`;
+}
+async function folhaPdf(f, c) {
+  $('#folha-t').textContent = 'Catálogo'; const cat = D.catalogos.find(x => x.id === f.id);
+  c.innerHTML = '<div class="vazio">Baixando o catálogo… (arquivo grande: prefira Wi‑Fi)</div>';
+  try {
+    if (!window.pdfjsLib) await new Promise((ok, erro) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'; s.onload = ok; s.onerror = () => erro(new Error('sem internet')); document.head.append(s); });
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    if (folhaPdf.id !== f.id) { folhaPdf.doc = await pdfjsLib.getDocument({ data: await Nuvem.baixarArquivo(`catalogos/${f.id}.pdf`) }).promise; folhaPdf.id = f.id; }
+    const doc = folhaPdf.doc; if (!M.folha || M.folha !== f) return;
+    const vp = (await doc.getPage(1)).getViewport({ scale: 1 });
+    c.innerHTML = `<h2>${esc(cat?.nome || '')}</h2><p class="muted">${doc.numPages} páginas</p>` + Array.from({ length: doc.numPages }, (_, i) => `<div class="pag" data-n="${i + 1}" style="aspect-ratio:${vp.width}/${vp.height}"></div>`).join('');
+    const obs = new IntersectionObserver(es => es.forEach(async e => {
+      if (!e.isIntersecting || e.target.dataset.ok) return; e.target.dataset.ok = 1;
+      const pg = await doc.getPage(+e.target.dataset.n), v = pg.getViewport({ scale: e.target.clientWidth * 2 / pg.getViewport({ scale: 1 }).width });
+      const cv = document.createElement('canvas'); cv.width = v.width; cv.height = v.height; e.target.append(cv); pg.render({ canvasContext: cv.getContext('2d'), viewport: v });
+    }), { root: c, rootMargin: '500px' });
+    $$('.pag', c).forEach(p => obs.observe(p));
+  } catch (e) { c.innerHTML = `<div class="vazio">Não consegui abrir o PDF.<br><small>${esc(/404/.test(e.message) ? 'O computador ainda não terminou de enviar este catálogo. Deixe o app do computador aberto por alguns minutos.' : e.message)}</small></div>`; }
+}
+
+/* ---------- eventos ---------- */
+document.addEventListener('click', e => {
+  const t = e.target.closest('button, a'); if (!t || t.tagName === 'A') return;
+  const d = t.dataset, f = M.folha;
+  if (d.aba) { M.aba = d.aba; $('#conteudo').innerHTML = ''; $('#conteudo').scrollTop = 0; return desenhar(); }
+  if (d.lead) return abreFolha({ tipo: 'lead', id: d.lead, volta: f && f.tipo !== 'lead' ? null : null });
+  if (d.etapa !== undefined) { M.etapa = d.etapa; return telaCarteira(); }
+  if (d.ps !== undefined) { M.pedStatus = d.ps; return telaPedidos(); }
+  if (d.mes) { M.mes = mudaMes(M.mes, +d.mes); return telaAgenda(); }
+  if (d.dia !== undefined) { M.dia = d.dia === M.dia ? null : (d.dia || null); return telaAgenda(); }
+  if (d.cat) { M.catId = d.cat; M.catQ = ''; return telaCatalogo(); }
+  if (d.ped) return abreFolha({ tipo: 'pedido', id: d.ped, volta: f && f.tipo === 'lead' ? f : null });
+  if (d.novoPed) return abreFolha({ tipo: 'pedido', leadId: d.novoPed, volta: f });
+  if (d.adiar) { const x = D.lembretes.find(x => x.id === d.adiar), dt = new Date(Math.max(new Date(x.quando), Date.now())); dt.setDate(dt.getDate() + 1); if (new Date(x.quando) < Date.now()) dt.setHours(9, 0, 0, 0); x.quando = isoLocal(dt); x.avisado = false; salvar(); return f ? abreFolha(f, true) : desenhar(); }
+  if (d.ldel) { D.lembretes = D.lembretes.filter(x => x.id !== d.ldel); salvar(); return f ? abreFolha(f, true) : desenhar(); }
+  if (d.rapido) {
+    if (d.rapido === 'x') return abreFolha({ tipo: 'lembrete', leadId: f.id, volta: f });
+    D.lembretes.push({ id: uid(), leadId: f.id, texto: 'Retornar contato', quando: emDias(+d.rapido), feito: false, avisado: false }); salvar(); aviso('Lembrete criado: ' + quandoBR(emDias(+d.rapido))); return abreFolha(f, true);
+  }
+  if (d.rm) { lePedido(f); f.p.itens.splice(+d.rm, 1); if (!f.p.itens.length) f.p.itens.push({ nome: '', ref: '', qtd: 1, preco: 0 }); return abreFolha(f, true); }
+  switch (t.id) {
+    case 'voltar': return fechaFolha();
+    case 'nuvem': return abreFolha({ tipo: 'config' });
+    case 'inst-ok': guarda.set('carteira-inst', 1); return telaCarteira();
+    case 'fab':
+      if (M.aba === 'carteira') { const l = { id: uid(), etapa: 'novo', obs: '', criadoEm: new Date().toISOString() }; CAMPOS.forEach(([k]) => l[k] = ''); l.razao = 'NOVO LEAD'; l.responsavel = D.leads[0]?.responsavel || ''; D.leads.push(l); salvar(); return abreFolha({ tipo: 'lead', id: l.id }); }
+      if (M.aba === 'agenda') return abreFolha({ tipo: 'lembrete', dia: M.dia });
+      if (M.aba === 'pedidos') return abreFolha({ tipo: 'pedido' });
+      return;
+    case 'l-del': if (t.dataset.certeza) { D.leads = D.leads.filter(x => x.id !== f.id); D.lembretes = D.lembretes.filter(x => x.leadId !== f.id); salvar(); return fechaFolha(); } t.dataset.certeza = 1; t.textContent = 'Toque de novo para confirmar a exclusão'; return;
+    case 'lb-ok': { const alvo = lead(f.leadId) || D.leads.find(x => x.razao === $('#lb-lead')?.value); if (!$('#lb-quando').value) return; D.lembretes.push({ id: uid(), leadId: alvo?.id || null, texto: $('#lb-txt').value.trim() || 'Retornar contato', quando: $('#lb-quando').value, feito: false, avisado: false }); salvar(); return fechaFolha(); }
+    case 'pd-add': lePedido(f); f.p.itens.push({ nome: '', ref: '', qtd: 1, preco: 0 }); return abreFolha(f, true);
+    case 'pd-ok': if (gravaPedido(f)) fechaFolha(); else abreFolha(f, true); return;
+    case 'pd-zap': { if (!gravaPedido(f)) return abreFolha(f, true); const z = linkZap(lead(f.p.leadId), textoPedido(f.p)); fechaFolha(); if (z) location.href = z; else aviso('Pedido salvo, mas o cliente está sem telefone válido.'); return; }
+    case 'pd-del': if (t.dataset.certeza) { D.pedidos = D.pedidos.filter(x => x.id !== f.p.id); salvar(); return fechaFolha(); } t.dataset.certeza = 1; t.textContent = 'Toque de novo para confirmar'; return;
+    case 'ver-pdf': return abreFolha({ tipo: 'pdf', id: M.catId });
+    case 'cf-sync': Nuvem.sujo = true; return Nuvem.ciclo();
+    case 'cf-sair': if (t.dataset.certeza) { localStorage.removeItem('carteira-cfg'); localStorage.removeItem('carteira-dados'); history.replaceState(null, '', location.pathname); location.reload(); } t.dataset.certeza = 1; t.textContent = 'Toque de novo para desconectar'; return;
+    case 'btn-conectar': { const cfg = leLink($('#cola').value.trim()); if (!cfg) return aviso('Esse link não parece certo. Copie de novo no computador.'); guarda.set('carteira-cfg', cfg); return entrar(); }
+  }
+});
+document.addEventListener('input', e => {
+  const t = e.target, f = M.folha;
+  if (t.id === 'q') { M.q = t.value; return telaCarteira(); }
+  if (t.id === 'cat-q') { M.catQ = t.value; return telaCatalogo(); }
+  if (f && f.tipo === 'lead' && t.dataset.f) {
+    const l = lead(f.id), k = t.dataset.f; l[k] = k === 'cnpj' ? (soDigitos(t.value).length === 14 ? soDigitos(t.value) : t.value.trim()) : (k === 'obs' ? t.value : t.value.trim());
+    l.atualizadoEm = new Date().toISOString(); if (k === 'razao') $('#l-t').textContent = l.razao; salvar();
+  }
+  if (f && f.tipo === 'pedido') {
+    const box = t.closest('[data-i]'); if (!box) return; const it = f.p.itens[box.dataset.i], c = t.dataset.c;
+    if (c === 'nome') { const x = f.rot.get(t.value); if (x) { it.nome = x.nome; it.ref = x.ref; it.preco = x.preco; t.value = x.nome; $('[data-c=preco]', box).value = x.preco; } else { it.nome = t.value; it.ref = ''; } }
+    else it[c] = parseFloat(String(t.value).replace(',', '.')) || 0;
+    $('#pd-total').textContent = 'Total: ' + dinheiro(totalPedido(f.p));
+  }
+});
+document.addEventListener('change', e => {
+  const t = e.target, f = M.folha;
+  if (t.dataset.feito) { D.lembretes.find(x => x.id === t.dataset.feito).feito = t.checked; salvar(); return setTimeout(() => f ? abreFolha(f, true) : desenhar(), 250); }
+  if (f && f.tipo === 'lead' && (t.dataset.f === 'telefone' || t.dataset.f === 'etapa')) abreFolha(f, true);
+});
+entrar();
+</script>
+</body>
+</html>

@@ -46,6 +46,80 @@ function produtosDe(D) {
   return [...m.values()];
 }
 
+/* ---------- planilhas: ler a lista de leads e juntar sem duplicar ---------- */
+const COLUNAS = [
+  ['cidade', h => h === 'CIDADE' || h === 'MUNICIPIO'], ['uf', h => h === 'UF' || h === 'ESTADO'], ['gerente', h => h.startsWith('GERENTE')],
+  ['consultor', h => h.startsWith('CONSULTOR')], ['razao', h => h.startsWith('RAZAO') || h === 'CLIENTE' || h === 'NOME'], ['zbrm', h => h.startsWith('ZBRM')],
+  ['situacao', h => h.startsWith('SITUACAO') || h === 'STATUS'], ['cnpj', h => h.startsWith('CNPJ')],
+  ['telefone', h => h.startsWith('TELEFONE') || h.startsWith('CELULAR') || h.startsWith('WHATSAPP') || h === 'FONE'],
+  ['franqueado', h => h.startsWith('FRANQUEADO')], ['responsavel', h => h === 'COLUNA1' || h.startsWith('RESPONSAVEL') || h === 'VENDEDOR'],
+];
+function leadsDasPlanilhas(planilhas) {
+  const out = [], n = c => semAcento(c).replace(/[^A-Z0-9]/g, '');
+  for (const rows of planilhas) {
+    let hi = -1, map = null;
+    for (let i = 0; i < Math.min(rows.length, 15); i++) {
+      const m = {};
+      (rows[i] || []).forEach((c, j) => { const h = n(c); if (!h) return; for (const [k, t] of COLUNAS) if (!(k in m) && t(h)) { m[k] = j; break; } });
+      if ('razao' in m || 'cnpj' in m) { hi = i; map = m; break; }
+    }
+    if (hi < 0) continue;
+    for (const r of rows.slice(hi + 1)) {
+      const o = {};
+      for (const k in map) o[k] = String(r[map[k]] ?? '').replace(/[\u00a0\u202c\u202a]/g, ' ').trim();
+      if (o.cnpj && /^\d+$/.test(o.cnpj)) o.cnpj = o.cnpj.padStart(14, '0');
+      if (o.razao || o.cnpj) out.push(o);
+    }
+  }
+  return out;
+}
+function chavesLead(l) {
+  const c = soDigitos(l.cnpj), z = soDigitos(l.zbrm);
+  return { c: c.length >= 11 ? c.padStart(14, '0') : '', z, n: semAcento(l.razao).replace(/[^A-Z0-9]/g, '') + '|' + semAcento(l.cidade).replace(/[^A-Z0-9]/g, '') };
+}
+function juntarLeads(D, linhas) {
+  const porC = new Map(), porZ = new Map(), porN = new Map();
+  const indexa = l => { const k = chavesLead(l); if (k.c) porC.set(k.c, l); if (k.z) porZ.set(k.z, l); porN.set(k.n, l); };
+  D.leads.forEach(indexa);
+  const r = { novos: 0, existentes: 0, completados: 0 };
+  for (const row of linhas) {
+    const k = chavesLead(row);
+    let ex = (k.c && porC.get(k.c)) || null;
+    if (!ex && k.z) { const c = porZ.get(k.z); if (c && (!k.c || !chavesLead(c).c)) ex = c; }
+    if (!ex) { const c = porN.get(k.n); if (c && ((!k.c && !k.z) || (!chavesLead(c).c && !chavesLead(c).z))) ex = c; }
+    if (ex) {
+      r.existentes++;
+      let mudou = false; // só preenche o que estava em branco; nunca apaga o que você editou
+      for (const [f] of CAMPOS) if (vazio(ex[f]) && !vazio(row[f])) { ex[f] = row[f]; mudou = true; }
+      if (mudou) { r.completados++; ex.atualizadoEm = new Date().toISOString(); }
+    } else {
+      const novo = { id: uid(), etapa: 'novo', obs: '', criadoEm: new Date().toISOString() };
+      for (const [f] of CAMPOS) novo[f] = row[f] ?? '';
+      D.leads.push(novo); indexa(novo); r.novos++;
+    }
+  }
+  return r;
+}
+function planilhaExport(leads) {
+  const nomeEtapa = id => (ETAPAS.find(e => e.id === id) || {}).nome || '';
+  return {
+    cabecalho: ['CIDADE', 'UF', 'GERENTE', 'CONSULTOR', 'RAZÃO SOCIAL', 'ZBRM', 'SITUAÇÃO', 'CNPJ LOJA', 'TELEFONE FRANQUEADO', 'FRANQUEADO', 'Coluna1', 'ETAPA', 'OBSERVAÇÕES'],
+    linhas: leads.map(l => [...CAMPOS.map(([k]) => k === 'cnpj' ? fmtCnpj(l[k]) : (l[k] ?? '')), nomeEtapa(l.etapa), l.obs || '']),
+  };
+}
+function filtraLeads(leads, f) {
+  const q = semAcento(f.q).trim(), qd = soDigitos(f.q);
+  return leads.filter(l => {
+    if (f.etapa && l.etapa !== f.etapa) return false;
+    if (f.cidade && semAcento(l.cidade).trim() !== f.cidade) return false;
+    if (f.consultor && l.consultor !== f.consultor) return false;
+    if (f.situacao && l.situacao !== f.situacao) return false;
+    if (!q) return true;
+    if (semAcento([l.razao, l.franqueado, l.cidade, l.consultor, l.zbrm, l.telefone, l.cnpj, l.obs].join(' ')).includes(q)) return true;
+    return qd.length >= 3 && (soDigitos(l.cnpj).includes(qd) || soDigitos(l.telefone).includes(qd));
+  });
+}
+
 /* ---------- calendário da Agenda ---------- */
 const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 function calendarioHTML(mes /* 'AAAA-MM' */, lembretes, diaSel) {
@@ -202,9 +276,9 @@ const Nuvem = {
   async apagarArquivo(arq) { const sha = await this.existe(arq); if (sha) await this.api('DELETE', this.caminho(arq), { message: 'remover catálogo', sha }); },
   // primeira configuração, feita pelo computador: cria os dois repositórios e publica o app do celular
   async instalar(token, arquivosSite, passo = () => {}) {
-    this.cfg = { token, dono: '?' };
+    const antes = this.cfg; this.cfg = { token, dono: (antes && antes.token === token && antes.dono) || '?' };
     passo('Conferindo o código…');
-    const u = await this.api('GET', '/user'); if (!u.ok) { this.cfg = null; throw await this.falha(u); }
+    const u = await this.api('GET', '/user'); if (!u.ok) { const f = await this.falha(u); this.cfg = antes || null; throw f; }
     const dono = (await u.json()).login; this.cfg.dono = dono;
     const garante = async (nome, privado, descricao) => {
       const r = await this.api('GET', `/repos/${dono}/${nome}`);
